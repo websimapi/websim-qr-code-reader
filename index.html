@@ -1,0 +1,126 @@
+<html><head><base href="." />
+<meta charset="utf-8" />
+<title>QR Code Reader</title>
+<script src="https://unpkg.com/html5-qrcode"></script>
+<style>
+  body {
+    font-family: system-ui, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #f0f2f5;
+  }
+
+  .container {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  h1 {
+    color: #1a73e8;
+    text-align: center;
+  }
+
+  #reader {
+    width: 100%;
+    margin: 20px 0;
+  }
+
+  #result {
+    margin: 20px 0;
+    padding: 15px;
+    border-radius: 8px;
+    background: #e8f0fe;
+    word-break: break-all;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  #fileInput {
+    display: none;
+  }
+
+  .upload-btn {
+    display: block;
+    width: 200px;
+    margin: 20px auto;
+    padding: 12px 24px;
+    background: #1a73e8;
+    color: white;
+    border: none;
+    border-radius: 24px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s;
+  }
+
+  .upload-btn:hover {
+    background: #1557b0;
+  }
+
+  .url-link {
+    color: #1a73e8;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .url-link:hover {
+    text-decoration: underline;
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>QR Code to URL Converter</h1>
+    
+    <label for="fileInput" class="upload-btn">Upload QR Code Image</label>
+    <input type="file" id="fileInput" accept="image/*">
+    
+    <div id="reader"></div>
+    <div id="result" class="hidden">
+      <strong>Detected URL:</strong><br>
+      <a id="urlLink" class="url-link" target="_blank"></a>
+    </div>
+  </div>
+
+<script>
+function onScanSuccess(decodedText) {
+  const resultDiv = document.getElementById('result');
+  const urlLink = document.getElementById('urlLink');
+  
+  resultDiv.classList.remove('hidden');
+  urlLink.href = decodedText;
+  urlLink.textContent = decodedText;
+}
+
+function onScanError(error) {
+  console.warn(error);
+}
+
+let html5QrcodeScanner;
+
+document.getElementById('fileInput').addEventListener('change', async function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  if (html5QrcodeScanner) {
+    html5QrcodeScanner.clear();
+  }
+
+  html5QrcodeScanner = new Html5Qrcode("reader");
+  
+  try {
+    const result = await html5QrcodeScanner.scanFile(file, true);
+    onScanSuccess(result);
+  } catch (error) {
+    onScanError(error);
+    alert('Could not decode QR Code from image. Please try another image.');
+  }
+});
+</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4c6229722a6346bc8eb5cb0e5eae5d41","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body></html>
